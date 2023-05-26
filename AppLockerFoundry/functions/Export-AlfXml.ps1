@@ -6,18 +6,19 @@
 .PARAMETER Rsop
     The AppLocker Foundry object to export.
 .PARAMETER Path
-    The path to the AppLocker XML file to export to.
+    The directory path to export the AppLocker XML file to.
 .EXAMPLE
     Export-AlfXml -Rsop $Rsop -Path C:\AppLocker.xml
 
-    Exports the AppLocker Foundry object $Rsop to C:\AppLocker.xml
+    Exports the AppLocker Foundry object $Rsop to C:\AppLocker
 .EXAMPLE
-    Get-DatumRsop $datum (Get-DatumNodesRecursive -AllDatumNodes $Datum.AllNodes) | Export-AlfXml -Path C:\AppLocker.xml
+    Get-DatumRsop $datum (Get-DatumNodesRecursive -AllDatumNodes $Datum.AllNodes) | Export-AlfXml -Path C:\AppLocker
 
-    Calculate policy objects from Datum and export them to C:\AppLocker.xml
+    Calculate policy objects from Datum and export them to C:\AppLocker
 #>
 function Export-AlfXml
 {
+    [OutputType([System.IO.FileInfo])]
     [CmdletBinding()]
     param
     (
@@ -30,7 +31,7 @@ function Export-AlfXml
         $Path
     )
 
-    begin
+    process
     {
         $xmlDoc = [System.Xml.XmlDocument]::new()
         $null = $xmlDoc.AppendChild($xmlDoc.CreateXmlDeclaration('1.0', 'UTF-8', $null))
@@ -38,10 +39,10 @@ function Export-AlfXml
         $versionAttr = $xmlDoc.CreateAttribute('Version')
         $versionAttr.InnerText = '1'
         $null = $policyNode.Attributes.Append($versionAttr)
-    }
-
-    process
-    {
+        Write-PSFMessage -Level Debug -Message ($Rsop | ConvertTo-Yaml)
+        $domainPath = Join-Path -Path $Path -ChildPath $Rsop['Domain']
+        $policyPath = Join-Path -Path $domainPath -ChildPath ('{0}.xml' -f $Rsop['PolicyName'])
+        Write-PSFMessage -Level Verbose -Message "Will export $($Rsop['PolicyName']) to $policyPath"
 
         foreach ($ruleCollection in $Rsop['RuleCollections'].GetEnumerator())
         {
@@ -55,6 +56,7 @@ function Export-AlfXml
 
             foreach ($rule in $ruleCollection.Value.Rules)
             {
+                Write-PSFMessage -Level Verbose -Message "Adding rule $($rule.Name)"
                 $guidAttr = $xmlDoc.CreateAttribute('Id')
                 $guidAttr.InnerText = [System.Guid]::NewGuid().ToString()
                 $nameAttr = $xmlDoc.CreateAttribute('Name')
@@ -71,11 +73,11 @@ function Export-AlfXml
                     # Path Rule
                     $ruleNode = $xmlDoc.CreateElement('FilePathRule')
                     $conditionNode = $xmlDoc.CreateElement('Conditions')
-                    foreach ($path in $rule.Path)
+                    foreach ($rulePath in $rule.Path)
                     {
                         $pathConditionNode = $xmlDoc.CreateElement('FilePathCondition')
                         $pathAttr = $xmlDoc.CreateAttribute('Path')
-                        $pathAttr.InnerText = $path
+                        $pathAttr.InnerText = $rulePath
                         $null = $pathConditionNode.Attributes.Append($pathAttr)
                         $null = $conditionNode.AppendChild($pathConditionNode)
                     }
@@ -86,7 +88,7 @@ function Export-AlfXml
                     {
                         $exceptionConditionNode = $xmlDoc.CreateElement('FilePathCondition')
                         $pathAttr = $xmlDoc.CreateAttribute('Path')
-                        $pathAttr.InnerText = $path
+                        $pathAttr.InnerText = $exception
                         $null = $pathConditionNode.Attributes.Append($pathAttr)
                         $null = $exceptionsNode.AppendChild($exceptionConditionNode)
                     }
@@ -153,11 +155,11 @@ function Export-AlfXml
                 $null = $policyNode.AppendChild($ruleCollectionNode)
             }
         }
-    }
-
-    end
-    {
+        
+        Write-PSFMessage -Level Verbose -Message "Exporting $($Rsop['PolicyName']) to $policyPath"
+        Write-PSFMessage -Level Debug -Message $xmlDoc.ToString()
         $null = $xmlDoc.AppendChild($policyNode)
-        $xmlDoc.Save($Path)
+        $xmlDoc.Save($policyPath)
+        Get-Item -Path $policyPath
     }
 }

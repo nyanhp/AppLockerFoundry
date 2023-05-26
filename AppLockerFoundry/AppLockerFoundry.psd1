@@ -4,7 +4,7 @@
     RootModule           = 'AppLockerFoundry.psm1'
 
     # Version number of this module.
-    ModuleVersion        = '1.0.0'
+    ModuleVersion        = '1.1.0'
 
     # Supported PSEditions
     CompatiblePSEditions = @(
@@ -19,7 +19,7 @@
     Author               = 'Jan-Hendrik Peters'
 
     # Company or vendor of this module
-    CompanyName          = 'Brunicorn IT'
+    CompanyName          = 'Jan-Hendrik Peters'
 
     # Copyright statement for this module
     Copyright            = '(c) Jan-Hendrik Peters. All rights reserved.'
