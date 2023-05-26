@@ -41,6 +41,12 @@ function Export-AlfXml
         $null = $policyNode.Attributes.Append($versionAttr)
         Write-PSFMessage -Level Debug -Message ($Rsop | ConvertTo-Yaml)
         $domainPath = Join-Path -Path $Path -ChildPath $Rsop['Domain']
+        if (-not (Test-Path -Path $domainPath))
+        {
+            Write-PSFMessage -Level Verbose -Message "Creating directory $domainPath"
+            $null = New-Item -Path $domainPath -ItemType Directory
+        }
+
         $policyPath = Join-Path -Path $domainPath -ChildPath ('{0}.xml' -f $Rsop['PolicyName'])
         Write-PSFMessage -Level Verbose -Message "Will export $($Rsop['PolicyName']) to $policyPath"
 
