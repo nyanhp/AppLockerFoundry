@@ -95,7 +95,7 @@ function Export-AlfXml
                         $exceptionConditionNode = $xmlDoc.CreateElement('FilePathCondition')
                         $pathAttr = $xmlDoc.CreateAttribute('Path')
                         $pathAttr.InnerText = $exception
-                        $null = $pathConditionNode.Attributes.Append($pathAttr)
+                        $null = $exceptionConditionNode.Attributes.Append($pathAttr)
                         $null = $exceptionsNode.AppendChild($exceptionConditionNode)
                     }
                     $null = $ruleNode.AppendChild($exceptionsNode)
