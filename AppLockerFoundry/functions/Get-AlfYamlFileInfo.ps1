@@ -49,7 +49,7 @@ function Get-AlfYamlFileInfo
                 { $_ -in '.dll', '.ocx' } { 'Dll' }
                 default
                 {
-                    Write-Error -Message "Invalid file extension for AppLocker: $_"
+                    Write-Verbose -Message "Invalid file extension for AppLocker: $_"
                     continue files
                 }
             }
