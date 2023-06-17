@@ -5,6 +5,8 @@
     Get AppLocker file information and convert it to YAML
 .PARAMETER Path
     The path to the file or directory to get AppLocker file information for.
+.PARAMETER OutPath
+    The path to the YAML file to write the AppLocker file information to.
 .EXAMPLE
     Get-ChildItem -Path "C:\Program Files\git" -Recurse -Filter *.exe | Get-AlfYamlFileInfo -OutPath configurationData\Apps\git.yml
 
