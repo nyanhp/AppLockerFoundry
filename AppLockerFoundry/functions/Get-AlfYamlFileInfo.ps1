@@ -6,9 +6,9 @@
 .PARAMETER Path
     The path to the file or directory to get AppLocker file information for.
 .EXAMPLE
-    Get-ChildItem -Path "C:\Program Files" -Recurse -Filter *.exe | Get-AlfYamlFileInfo
+    Get-ChildItem -Path "C:\Program Files\git" -Recurse -Filter *.exe | Get-AlfYamlFileInfo -OutPath configurationData\Apps\git.yml
 
-    Get AppLocker file information for all files in "C:\Program Files" and convert it to YAML
+    Get AppLocker file information for all files in "C:\Program Files\git" and convert it to YAML
 #>
 function Get-AlfYamlFileInfo
 {
@@ -17,7 +17,11 @@ function Get-AlfYamlFileInfo
         [Parameter(Mandatory = $true, ValueFromPipeline = $true, ValueFromPipelineByPropertyName = $true)]
         [Alias('FullName')]
         [string[]]
-        $Path
+        $Path,
+
+        [Parameter(Mandatory = $true)]
+        [string]
+        $OutPath
     )
 
     begin
@@ -106,6 +110,11 @@ function Get-AlfYamlFileInfo
 
     end
     {
-        $yamlObject | ConvertTo-Yaml
+        if (-not (Test-Path -Path (Split-Path -Path $OutPath -Parent)))
+        {
+            New-Item -Path (Split-Path -Path $OutPath -Parent) -ItemType Directory -Force | Out-Null
+        }
+
+        $yamlObject | ConvertTo-Yaml -OutFile $OutPath -Force
     }
 }
