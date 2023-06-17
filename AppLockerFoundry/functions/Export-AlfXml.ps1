@@ -165,6 +165,13 @@ function Export-AlfXml
         Write-PSFMessage -Level Verbose -Message "Exporting $($Rsop['PolicyName']) to $policyPath"
         Write-PSFMessage -Level Debug -Message $xmlDoc.ToString()
         $null = $xmlDoc.AppendChild($policyNode)
+        $parent = Split-Path -Parent -Path $policyPath
+        if (-not (Test-Path -Path $parent))
+        {
+            Write-PSFMessage -Level Verbose -Message "Creating directory $parent"
+            $null = New-Item -Path $parent -ItemType Directory
+        }
+
         $xmlDoc.Save($policyPath)
         Get-Item -Path $policyPath
     }

@@ -89,6 +89,8 @@ function Get-AlfYamlFileInfo
                         LowSection  = $fileInfo.Publisher.BinaryVersion.ToString()
                         HighSection = $fileInfo.Publisher.BinaryVersion.ToString()
                     }
+                    UserOrGroupSid     = 'S-1-1-0'
+                    Action             = 'Allow'
                 }
                 $null = $yamlObject['RuleCollections'][$ruleType].Rules.Add($obj)
             }
@@ -102,6 +104,8 @@ function Get-AlfYamlFileInfo
                     HashDataString   = $fileInfo.Hash.HashDataString
                     SourceFileName   = $fileInfo.Hash.SourceFileName
                     SourceFileLength = $fileInfo.Hash.SourceFileLength
+                    UserOrGroupSid   = 'S-1-1-0'
+                    Action           = 'Allow'
                 }
                 $null = $yamlObject['RuleCollections'][$ruleType].Rules.Add($obj)
             }
